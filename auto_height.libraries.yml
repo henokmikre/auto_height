@@ -10,5 +10,4 @@ initialize:
     js/init-autoheight.js: {}
   dependencies:
     - core/jquery
-    - core/drupal
     - core/drupalSettings
