@@ -5,41 +5,126 @@
  * Provides dynamic adjustment of column heights, matching the biggest column in each Row.
  */
 
-use Drupal\Core\Routing\RouteMatchInterface;
-
 // Defining Constants.
+define("AUTOHEIGHT_DEFAULT_SELECTOR", '.block');
 define("AUTOHEIGHT_PLUGIN_URL", 'https://raw.githubusercontent.com/monocult/jquery-autoheight/master/jquery.autoheight.js');
-define("AUTOHEIGHT_LIBRARY_PATH", '/libraries/autoheight/jquery.autoheight.js');
+define("AUTOHEIGHT_PLUGIN_FILENAME", 'jquery.autoheight.js');
 
 /**
  * Implements hook_help().
  */
-function auto_height_help($route_name, RouteMatchInterface $route_match) {
-
-  switch ($route_name) {
-    case 'help.page.auto_height':
-      return check_markup(file_get_contents(dirname(__FILE__) . '/README.txt'));
+function auto_height_help($path, $arg) {
+  switch ($path) {
+    case 'admin/help#auto_height':
+      return check_markup(file_get_contents(dirname(__FILE__) . "/README.txt"));
   }
+}
+
+/**
+ * Implements hook_permission().
+ */
+function auto_height_permission() {
+  return array(
+    'administer autoheight' => array(
+      'title' => t('Administer jQuery Auto Height'),
+    )
+  );
+}
+
+/**
+ * Implements hook_menu().
+ */
+function auto_height_menu() {
+  $items = array();
+
+  $items['admin/config/media/auto_height'] = array(
+    'title' => 'jQuery Auto Height',
+    'description' => 'Configuration for jQuery Auto Height module',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('auto_height_form'),
+    'access arguments' => array('administer autoheight'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  return $items;
+}
+
+/**
+ * Configuraton form, called by drupal_get_form()
+ * in auto_height_menu().
+ */
+function auto_height_form($form, &$form_state) {
+
+  // Is the library installed?
+  $path = libraries_get_path('autoheight') . '/jquery.autoheight.js'; // if required, use plugin packaged with the module.
+  $installed = file_exists($path);
+  if (!$installed) {
+    $message = t('You need to download the jQuery AutoHeight plugin to use this module. Download it from !autoheight-site and copy it to !autoheight-library/!autoheight-filename.', array(
+      '!autoheight-site' => l(t('here'), AUTOHEIGHT_PLUGIN_URL),
+      '!autoheight-library' => libraries_get_path('autoheight'),
+      '!autoheight-filename' => AUTOHEIGHT_PLUGIN_FILENAME,
+    ));
+    drupal_set_message(filter_xss_admin($message), $type = 'warning');
+  }
+
+  $form['auto_height_intro'] = array(
+    '#markup' => '<p>jQuery Auto Height module dynamically adjust column heights, matching the biggest column in each Row.</p>',
+  );
+
+  $form['auto_height_selectors'] = array(
+    '#type' => 'textarea',
+    '#title' => t('jQuery Class Selectors'),
+    '#default_value' => variable_get('autoheight_selectors', AUTOHEIGHT_DEFAULT_SELECTOR),
+    '#rows' => 3,
+    '#description' => t('Enter jQuery class selectors for your row column elements e.g., ".classname". Use a new line for each selector.'),
+    '#required' => TRUE,
+  );
+
+  return system_settings_form($form);
+}
+
+/**
+ * Implements hook_page_build().
+ * 
+ * Include jQuery AutoHeight plugin on every page
+ */
+function auto_height_page_build(&$page) {
+
+  // Is the library installed?
+  $path = libraries_get_path('autoheight') . '/jquery.autoheight.js'; // if required, use plugin packaged with the module.
+  $installed = file_exists($path);
+  if (!$installed) {
+    return;
+  }
+
+  // Add the library reference
+  drupal_add_js($path, array(
+    'group' => JS_LIBRARY,
+    'every_page' => TRUE,
+  ));
+
+  // Get all the class selectors.
+  $autoheight_selectors = variable_get('autoheight_selectors', AUTOHEIGHT_DEFAULT_SELECTOR);
+  $autoheight_selectors_array = explode(PHP_EOL, $autoheight_selectors);
+  
+  // Export these variables to Drupal.settings
+  drupal_add_js(array('autoheight' => array(
+    'selectors' => $autoheight_selectors_array,
+  )), 'setting');
 
 }
 
 /**
- * Implements hook_page_attachments().
+ * Implements hook_library().
  */
-function auto_height_page_attachments(array &$page) {
-  
-  // Get all the classes.
-  $config = \Drupal::config('auto_height.settings');
-  $class_selectors = $config->get('class_selectors');
-  
-  // Comma seperated classes for the js file.
-  $js_selectors = implode(',', explode(PHP_EOL, $class_selectors));
-  
-  // Export settings
-  $page['#attached']['drupalSettings']['auto_height']['selectors'] = $js_selectors;
-  
-  // Attach libraries
-  $page['#attached']['library'][] = 'auto_height/autoheight';
-  $page['#attached']['library'][] = 'auto_height/initialize';
-  
+function auto_height_library() {
+  $libraries['autoheight'] = array(
+    'title' => 'jQuery AutoHeight',
+    'website' => 'https://github.com/monocult/jquery-autoheight',
+    'version' => '1.0.0',
+    'js' => array(
+      'jquery.autoheight.js' => array(),
+    ),
+  );
+  return $libraries;
 }

@@ -1,44 +1,67 @@
 <?php
-
 /**
  * @file
- * Install, update, and uninstall functions for the jQuery Auto Height module.
+ * Install, update and uninstall functions for the 'jQuery Auto Height' module.
  */
 
 /**
- * Implements hook_requirements().
+ * If the plugin doesn't exist, show a warning on the status report page
  */
 function auto_height_requirements($phase) {
   $requirements = array();
-
-  // Check if plugin exists
-  if ($phase == 'install') {
-    $path = DRUPAL_ROOT . '/libraries/autoheight/jquery.autoheight.js';
-    $installed = file_exists($path);
-    if (!$installed) {
-      // display a warning message..
-      drupal_set_message(t('The jQuery AutoHeight plugin is missing. <a href="https://raw.githubusercontent.com/monocult/jquery-autoheight/master/jquery.autoheight.js" rel="external">Download the plugin</a> and place it in /libraries/autoheight/jquery.autoheight.js'), 'warning');
-    }
+  switch ($phase) {
+    case 'runtime':
+      $path = libraries_get_path('autoheight') . '/jquery.autoheight.js';
+      $installed = file_exists($path);
+      if (!$installed) {
+        $requirements[] = array(
+          'title' => t('jQuery AutoHeight plugin'),
+          'value' => t('Missing'),
+          'description' => t('The jQuery AutoHeight plugin is missing. Download it from !autoheight-url and copy it to !autoheight-library/!autoheight-filename.', array(
+            '!autoheight-url' => l(AUTOHEIGHT_PLUGIN_URL, AUTOHEIGHT_PLUGIN_URL, array('external' => TRUE)),
+            '!autoheight-library' => libraries_get_path('autoheight'),
+            '!autoheight-filename' => AUTOHEIGHT_PLUGIN_FILENAME,
+          )),
+          'severity' => REQUIREMENT_ERROR,
+        );
+      }
+      else {
+        $requirements[] = array(
+          'title' => t('jQuery AutoHeight plugin'),
+          'value' => t('Installed'),
+          'severity' => REQUIREMENT_OK,
+        );
+      }
+      break;
   }
-  else if ($phase == 'runtime') {
-    $path = DRUPAL_ROOT . '/libraries/autoheight/jquery.autoheight.js';
-    $installed = file_exists($path);
-    if (!$installed) {
-      $requirements['auto_height'] = array(
-        'title' => t('jQuery AutoHeight plugin'),
-        'value' => t('Missing'),
-        'description' => t('<a href=":url" rel="external">Download the plugin</a> and place it in :library', array(':url' => AUTOHEIGHT_PLUGIN_URL, ':library' => AUTOHEIGHT_LIBRARY_PATH)),
-        'severity' => REQUIREMENT_WARNING,
-      );
-    }
-    else {
-      $requirements['auto_height'] = array(
-        'title' => t('jQuery AutoHeight plugin'),
-        'value' => t('Installed'),
-        'severity' => REQUIREMENT_OK,
-      );
-    }
-  }
-  
   return $requirements;
+}
+
+/**
+ * Enable the module
+ */
+function auto_height_enable() {
+  $path = libraries_get_path('autoheight') . '/jquery.autoheight.js';
+  $installed = file_exists($path);
+  if (!$installed) {
+    $message = t('Require the jQuery AutoHeight plugin to use this module. Download it from !autoheight-url and place it to the sites/all/libraries/autoheight directory i.e. sites/all/libraries/autoheight/!autoheight-filename.', array(
+      '!autoheight-url' => l(t('here'), AUTOHEIGHT_PLUGIN_URL),
+      '!autoheight-filename' => AUTOHEIGHT_PLUGIN_FILENAME,
+    ));
+    drupal_set_message(filter_xss_admin($message), $type = 'warning');
+  }
+  else {
+    $message = t('You have the jQuery AutoHeight plugin installed. Configure the module !autoheight-configuration', array(
+      '!autoheight-configuration' => l(t('here'), 'admin/config/media/auto_height'),
+    ));
+    drupal_set_message(filter_xss_admin($message));
+  }
+}
+
+/**
+ * Uninstall the module
+ */
+function auto_height_uninstall() {
+  // Delete module variables
+  variable_del('autoheight_selectors');
 }

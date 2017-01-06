@@ -1,0 +1,8 @@
+name = jQuery Auto Height
+description = Dynamically adjust column heights, matching the biggest column in each Row.
+core = 7.x
+package = Auto Height
+dependencies[] = libraries
+dependencies[] = jquery_update
+configure = admin/config/media/auto_height
+scripts[] = js/init-autoheight.js

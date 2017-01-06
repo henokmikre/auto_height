@@ -3,17 +3,33 @@
  * Contains definition of the behaviour jsAutoHeight.
  */
 
-(function ($, Drupal, drupalSettings) {
-  "use strict";
-
+(function ($) {
   Drupal.behaviors.jsAutoHeight = {
     attach: function (context, settings) {
+      try
+      {
+        // Check that AutoHeight() exists
+        if (typeof $.fn.AutoHeight !== 'undefined') {
 
-      try {
-	  window.onload = Refresh;
-	  function Refresh() {
-        //$('.classname').AutoHeight();
-        $(drupalSettings.auto_height.selectors).AutoHeight();
+          // Check that the settings object exists
+          if (typeof settings.autoheight !== 'undefined') {
+
+            // Default settings value
+            var selectors = ['.block'];
+
+            // Get settings for this behaviour
+            if (typeof settings.autoheight.selectors !== 'undefined') {
+              selectors = settings.autoheight.selectors;
+            }
+
+			window.onload = Refresh;
+            function Refresh() {
+            //$('.classname').AutoHeight();
+              for (var i = 0; i < selectors.length; i ++) {
+              $(selectors[i]).AutoHeight();
+              }
+			}
+          }
         }
       }
       catch (e) {
@@ -21,8 +37,6 @@
         window.console && console.warn('jQuery Auto Height module stopped working with the exception:');
         window.console && console.error(e);
       }
-
     }
   };
-
-})(jQuery, Drupal, drupalSettings);
+}(jQuery));

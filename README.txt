@@ -17,7 +17,9 @@ FEATURES
 REQUIREMENTS
 ------------
 
-Libraries API module - https://www.drupal.org/project/libraries
+Libraries API module - 2.x
+
+jQuery Update module - preferably jQuery 2.x or higher
 
 'jQuery AutoHeight' plugin - https://raw.githubusercontent.com/monocult/jquery-autoheight/master/jquery.autoheight.js
 
@@ -26,15 +28,15 @@ INSTALLATION
 
 1. Download 'jQuery Auto Height' module archive - https://www.drupal.org/project/auto_height
 
-2. Extract and place it in the root modules directory i.e. /modules/auto_height
+2. Extract and place it in the modules directory i.e. sites/all/modules/auto_height
 
-3. Create a libraries directory in the root, if not already there i.e. /libraries
+3. Create a libraries directory , if not already there i.e. sites/all/libraries
 
-4. Create a autoheight directory inside it i.e. /libraries/autoheight
+4. Create a autoheight directory inside it i.e. sites/all/libraries/autoheight
 
 5. Download 'jQuery AutoHeight' plugin - https://raw.githubusercontent.com/monocult/jquery-autoheight/master/jquery.autoheight.js
 
-6. Place it in the /libraries/autoheight directory i.e. /libraries/autoheight/jquery.autoheight.js
+6. Place it in the sites/all/libraries/autoheight directory i.e. sites/all/libraries/autoheight/jquery.autoheight.js
 
 7. Now, enable 'jQuery Auto Height' module
 
