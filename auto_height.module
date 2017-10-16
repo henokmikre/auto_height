@@ -71,13 +71,12 @@ function auto_height_form($form, &$form_state) {
     '#markup' => '<p>jQuery Auto Height module dynamically adjust column heights, matching the biggest column in each Row.</p>',
   );
 
-  $form['auto_height_selectors'] = array(
+  $form['autoheight_selectors'] = array(
     '#type' => 'textarea',
     '#title' => t('jQuery Class Selectors'),
     '#default_value' => variable_get('autoheight_selectors', AUTOHEIGHT_DEFAULT_SELECTOR),
     '#rows' => 3,
     '#description' => t('Enter jQuery class selectors for your row column elements e.g., ".classname". Use a new line for each selector.'),
-    '#required' => TRUE,
   );
 
   return system_settings_form($form);
