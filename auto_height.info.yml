@@ -3,9 +3,6 @@ description: Dynamically adjust column heights, matching the biggest column in e
 package: Auto Height
 
 type: module
-core: 8.x
+core_version_requirement: ^8 || ^9
 
-dependencies:
-  - libraries
-
-configure: auto_height.admin_settings
+configure: auto_height.admin_settings 
