@@ -10,8 +10,8 @@
     attach: function (context, settings) {
 
       try {
-	  window.onload = Refresh;
-	  function Refresh() {
+      window.onload = Refresh;
+      function Refresh() {
         //$('.classname').AutoHeight();
         $(drupalSettings.auto_height.selectors).AutoHeight();
         }

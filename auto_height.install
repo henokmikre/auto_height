@@ -9,36 +9,40 @@
  * Implements hook_requirements().
  */
 function auto_height_requirements($phase) {
-  $requirements = array();
+  $requirements = [];
 
-  // Check if plugin exists
+  // Check if plugin exists.
   if ($phase == 'install') {
     $path = DRUPAL_ROOT . '/libraries/autoheight/jquery.autoheight.js';
     $installed = file_exists($path);
     if (!$installed) {
-      // display a warning message..
-      \Drupal::messenger()->addMessage(t('The jQuery AutoHeight plugin is missing. <a href="https://raw.githubusercontent.com/monocult/jquery-autoheight/master/jquery.autoheight.js" rel="external">Download the plugin</a> and place it in /libraries/autoheight/jquery.autoheight.js'), 'warning');
+      // Display a warning message.
+      \Drupal::messenger()
+        ->addMessage(t('The jQuery AutoHeight plugin is missing. <a href="https://raw.githubusercontent.com/monocult/jquery-autoheight/master/jquery.autoheight.js" rel="external">Download the plugin</a> and place it in /libraries/autoheight/jquery.autoheight.js'), 'warning');
     }
   }
-  else if ($phase == 'runtime') {
+  elseif ($phase == 'runtime') {
     $path = DRUPAL_ROOT . '/libraries/autoheight/jquery.autoheight.js';
     $installed = file_exists($path);
     if (!$installed) {
-      $requirements['auto_height'] = array(
+      $requirements['auto_height'] = [
         'title' => t('jQuery AutoHeight plugin'),
         'value' => t('Missing'),
-        'description' => t('<a href=":url" rel="external">Download the plugin</a> and place it in :library', array(':url' => AUTOHEIGHT_PLUGIN_URL, ':library' => AUTOHEIGHT_LIBRARY_PATH)),
+        'description' => t('<a href=":url" rel="external">Download the plugin</a> and place it in :library', [
+          ':url' => AUTO_HEIGHT_PLUGIN_URL,
+          ':library' => AUTO_HEIGHT_LIBRARY_PATH,
+        ]),
         'severity' => REQUIREMENT_WARNING,
-      );
+      ];
     }
     else {
-      $requirements['auto_height'] = array(
+      $requirements['auto_height'] = [
         'title' => t('jQuery AutoHeight plugin'),
         'value' => t('Installed'),
         'severity' => REQUIREMENT_OK,
-      );
+      ];
     }
   }
-  
+
   return $requirements;
 }
